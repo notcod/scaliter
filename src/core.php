@@ -117,8 +117,8 @@ class core
                 if (is_array($array[$extension]) && array_key_exists($asset, $array[$extension]))
                     $includes = array_merge($array[$extension][$asset], $includes);
         if (isset($data['view']) && isset($data['page'])) {
-            $includes[] = "/assets/$extension/$data[view].$extension";
-            $includes[] = "/assets/$extension/$data[view]/$data[page].$extension";
+            $includes[] = "/$extension/$data[view].$extension";
+            $includes[] = "/$extension/$data[view]/$data[page].$extension";
         }
 
         $init_assets = $array[$extension]['init'] ?? [];
