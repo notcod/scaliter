@@ -66,11 +66,8 @@ class core
 
         $this->confirm();
 
-        $assets = file_get_contents(SERVER['INI'] . '/assets.inc.json');
-        $assets = json_decode($assets, true);
-
-        $this->data['js'] = $this->asset($assets, 'js', true);
-        $this->data['css'] = $this->asset($assets, 'css', true);
+        $this->data['js'] = $this->asset(ASSETS, 'js', true);
+        $this->data['css'] = $this->asset(ASSETS, 'css', true);
     }
     function get($type = 'css' || 'js')
     {
