@@ -1,0 +1,18 @@
+{
+    "name": "notcod/scaliter",
+    "type": "library",
+    "require": {
+        "nodejs-php-fallback/uglify": "^1.0",
+        "phpmailer/phpmailer": "^6.8",
+        "soundasleep/html2text": "^2.1"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Notcod\\Scaliter\\": "src/"
+        },
+        "files": [
+            "src/functions.php"
+        ]
+    }
+}

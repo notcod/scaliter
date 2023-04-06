@@ -1,0 +1,361 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "98855df6c8079a26fcaff2be56b270fa",
+    "packages": [
+        {
+            "name": "gkralik/php-uglifyjs",
+            "version": "1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/gkralik/php-uglifyjs.git",
+                "reference": "0c63301bf131c6c0e48ef26cf40e65bf20936932"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/gkralik/php-uglifyjs/zipball/0c63301bf131c6c0e48ef26cf40e65bf20936932",
+                "reference": "0c63301bf131c6c0e48ef26cf40e65bf20936932",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "GK\\": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-2.1-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Gregor Kralik",
+                    "email": "g.kralik@gmail.com"
+                }
+            ],
+            "description": "PHP Javascript packer",
+            "support": {
+                "issues": "https://github.com/gkralik/php-uglifyjs/issues",
+                "source": "https://github.com/gkralik/php-uglifyjs/tree/1.0.2"
+            },
+            "time": "2019-10-03T11:54:22+00:00"
+        },
+        {
+            "name": "natxet/cssmin",
+            "version": "v3.0.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/natxet/CssMin.git",
+                "reference": "d5d9f4c3e5cedb1ae96a95a21731f8790e38f1dd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/natxet/CssMin/zipball/d5d9f4c3e5cedb1ae96a95a21731f8790e38f1dd",
+                "reference": "d5d9f4c3e5cedb1ae96a95a21731f8790e38f1dd",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0-dev"
+                }
+            },
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Joe Scylla",
+                    "email": "joe.scylla@gmail.com",
+                    "homepage": "https://profiles.google.com/joe.scylla"
+                }
+            ],
+            "description": "Minifying CSS",
+            "homepage": "http://code.google.com/p/cssmin/",
+            "keywords": [
+                "css",
+                "minify"
+            ],
+            "support": {
+                "issues": "https://github.com/natxet/CssMin/issues",
+                "source": "https://github.com/natxet/CssMin/tree/master"
+            },
+            "time": "2018-01-09T11:15:01+00:00"
+        },
+        {
+            "name": "nodejs-php-fallback/nodejs-php-fallback",
+            "version": "1.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kylekatarnls/nodejs-php-fallback.git",
+                "reference": "0dbdbc0cccf3c6c4a86189b21ce898252e287072"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kylekatarnls/nodejs-php-fallback/zipball/0dbdbc0cccf3c6c4a86189b21ce898252e287072",
+                "reference": "0dbdbc0cccf3c6c4a86189b21ce898252e287072",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^1.0 || ^2.0",
+                "php": ">=7.3"
+            },
+            "require-dev": {
+                "composer/composer": "^2.0",
+                "phpmd/phpmd": "^2.9",
+                "phpunit/phpunit": "^8.5"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.x-dev"
+                },
+                "class": "NodejsPhpFallback\\ComposerPlugin"
+            },
+            "autoload": {
+                "psr-4": {
+                    "NodejsPhpFallback\\": "src/NodejsPhpFallback/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kyle",
+                    "email": "kylekatarnls@gmail.com"
+                }
+            ],
+            "description": "Allow you to call node.js module or scripts throught PHP and call a fallback function if node.js is not available",
+            "support": {
+                "issues": "https://github.com/kylekatarnls/nodejs-php-fallback/issues",
+                "source": "https://github.com/kylekatarnls/nodejs-php-fallback/tree/1.6.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/kylekatarnls",
+                    "type": "github"
+                },
+                {
+                    "url": "https://opencollective.com/Carbon",
+                    "type": "open_collective"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/nesbot/carbon",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-10-30T09:26:47+00:00"
+        },
+        {
+            "name": "nodejs-php-fallback/uglify",
+            "version": "1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kylekatarnls/uglify.git",
+                "reference": "b3572042b6710173f8a3378b8b5c76f8ecdc74a8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kylekatarnls/uglify/zipball/b3572042b6710173f8a3378b8b5c76f8ecdc74a8",
+                "reference": "b3572042b6710173f8a3378b8b5c76f8ecdc74a8",
+                "shasum": ""
+            },
+            "require": {
+                "gkralik/php-uglifyjs": "*",
+                "natxet/cssmin": "*",
+                "nodejs-php-fallback/nodejs-php-fallback": "^1.2.3"
+            },
+            "require-dev": {
+                "codeclimate/php-test-reporter": "dev-master",
+                "composer/composer": "^1.2",
+                "phpunit/phpunit": ">=4.8 <6.0"
+            },
+            "type": "library",
+            "extra": {
+                "npm": [
+                    "uglify-js",
+                    "clean-css"
+                ]
+            },
+            "autoload": {
+                "psr-0": {
+                    "NodejsPhpFallback\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kyle",
+                    "email": "kylekatarnls@gmail.com"
+                }
+            ],
+            "description": "PHP wrapper to execute uglify-js/clean-css node package or fallback to PHP alternatives",
+            "support": {
+                "issues": "https://github.com/kylekatarnls/uglify/issues",
+                "source": "https://github.com/kylekatarnls/uglify/tree/master"
+            },
+            "time": "2019-01-16T14:47:09+00:00"
+        },
+        {
+            "name": "phpmailer/phpmailer",
+            "version": "v6.8.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PHPMailer/PHPMailer.git",
+                "reference": "df16b615e371d81fb79e506277faea67a1be18f1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/df16b615e371d81fb79e506277faea67a1be18f1",
+                "reference": "df16b615e371d81fb79e506277faea67a1be18f1",
+                "shasum": ""
+            },
+            "require": {
+                "ext-ctype": "*",
+                "ext-filter": "*",
+                "ext-hash": "*",
+                "php": ">=5.5.0"
+            },
+            "require-dev": {
+                "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2",
+                "doctrine/annotations": "^1.2.6 || ^1.13.3",
+                "php-parallel-lint/php-console-highlighter": "^1.0.0",
+                "php-parallel-lint/php-parallel-lint": "^1.3.2",
+                "phpcompatibility/php-compatibility": "^9.3.5",
+                "roave/security-advisories": "dev-latest",
+                "squizlabs/php_codesniffer": "^3.7.1",
+                "yoast/phpunit-polyfills": "^1.0.4"
+            },
+            "suggest": {
+                "ext-mbstring": "Needed to send email in multibyte encoding charset or decode encoded addresses",
+                "ext-openssl": "Needed for secure SMTP sending and DKIM signing",
+                "greew/oauth2-azure-provider": "Needed for Microsoft Azure XOAUTH2 authentication",
+                "hayageek/oauth2-yahoo": "Needed for Yahoo XOAUTH2 authentication",
+                "league/oauth2-google": "Needed for Google XOAUTH2 authentication",
+                "psr/log": "For optional PSR-3 debug logging",
+                "symfony/polyfill-mbstring": "To support UTF-8 if the Mbstring PHP extension is not enabled (^1.2)",
+                "thenetworg/oauth2-azure": "Needed for Microsoft XOAUTH2 authentication"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PHPMailer\\PHPMailer\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-2.1-only"
+            ],
+            "authors": [
+                {
+                    "name": "Marcus Bointon",
+                    "email": "phpmailer@synchromedia.co.uk"
+                },
+                {
+                    "name": "Jim Jagielski",
+                    "email": "jimjag@gmail.com"
+                },
+                {
+                    "name": "Andy Prevost",
+                    "email": "codeworxtech@users.sourceforge.net"
+                },
+                {
+                    "name": "Brent R. Matzelle"
+                }
+            ],
+            "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
+            "support": {
+                "issues": "https://github.com/PHPMailer/PHPMailer/issues",
+                "source": "https://github.com/PHPMailer/PHPMailer/tree/v6.8.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/Synchro",
+                    "type": "github"
+                }
+            ],
+            "time": "2023-03-06T14:43:22+00:00"
+        },
+        {
+            "name": "soundasleep/html2text",
+            "version": "2.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/soundasleep/html2text.git",
+                "reference": "83502b6f8f1aaef8e2e238897199d64f284b4af3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/soundasleep/html2text/zipball/83502b6f8f1aaef8e2e238897199d64f284b4af3",
+                "reference": "83502b6f8f1aaef8e2e238897199d64f284b4af3",
+                "shasum": ""
+            },
+            "require": {
+                "ext-dom": "*",
+                "ext-libxml": "*",
+                "php": "^7.3|^8.0"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^1.9",
+                "phpunit/phpunit": "^7.0|^8.0|^9.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Soundasleep\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jevon Wright",
+                    "homepage": "https://jevon.org",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A PHP script to convert HTML into a plain text format",
+            "homepage": "https://github.com/soundasleep/html2text",
+            "keywords": [
+                "email",
+                "html",
+                "php",
+                "text"
+            ],
+            "support": {
+                "email": "support@jevon.org",
+                "issues": "https://github.com/soundasleep/html2text/issues",
+                "source": "https://github.com/soundasleep/html2text/tree/2.1.0"
+            },
+            "time": "2023-01-06T09:28:15+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": [],
+    "plugin-api-version": "2.1.0"
+}
