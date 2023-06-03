@@ -68,6 +68,15 @@ class core
     {
         if (!isset($this->data[$type])) return;
 
+        if (defined("ONEFILE")) {
+            array_walk($this->data[$type], function (&$val, $key) {
+                $val = SERVER['PUB'] . $val;
+            });
+            $uglify = new \NodejsPhpFallback\Uglify($this->data[$type]);
+            print $type == 'css' ? '<style>' . $uglify . '</style>' : '<script>' . $uglify . '</script>';
+            return;
+        }
+
         if (PRODUCTION) return $this->manifest($this->data[$type], $type);
 
         foreach ($this->data[$type] as $inc) {
