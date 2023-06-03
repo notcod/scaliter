@@ -2,6 +2,7 @@
 
 class database
 {
+	public $DB, $sql;
 	function __construct($host = DB['HOST'], $user = DB['USER'], $pass = DB['PASS'], $name = DB['NAME'])
 	{
 		$this->DB = new \mysqli($host, $user, $pass, $name);
@@ -10,7 +11,7 @@ class database
 
 		$this->DB->set_charset("utf8mb4");
 
-		return $this->DB;
+		// return $this->DB;
 	}
 	function real_escape_string($string)
 	{
