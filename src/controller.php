@@ -2,7 +2,7 @@
 
 class controller
 {
-    public $DB;
+    public $DB, $IP, $data, $_req;
     public function __construct()
     {
         $this->IP = USER['IP'];
