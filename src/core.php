@@ -2,36 +2,15 @@
 
 class core
 {
-    public $data;
+    public $data, $session;
     public function __construct($REQUEST = '', $rewrite = [])
     {
-        $this->web_production = strpos($this->getHeader('COOKIE'), 'production=off') !== false;
         $this->session = $_COOKIE[session_name()] ?? 'undefined';
-
-        if (isset($_GET['production']) && $_GET['production'] == 'off') {
-            setcookie('production', 'off', 0, '/');
-            $location = str_replace('&production=off', '', $_SERVER['REQUEST_URI']);
-            $location = str_replace('?production=off', '', $location);
-            header('Location: ' . $location);
-            exit;
-        }
-        if (isset($_GET['merge'])) {
-            setcookie('production', 'on', 0, '/');
-            $location = str_replace('&merge', '', $_SERVER['REQUEST_URI']);
-            $location = str_replace('?merge', '', $location);
-            $output = shell_exec('../merge');
-            header('Location: ' . $location . '#' . $output);
-            exit;
-        }
-
         $extension = pathinfo($REQUEST, PATHINFO_EXTENSION);
-        if (array_key_exists($extension, STATIC_FILES)) return new statics($REQUEST, $extension);
+        if (array_key_exists($extension, STATIC_FILES)) exit(new statics($REQUEST, $extension));
 
         if (PRODUCTION) ob_start('sanitize');
 
-        // if (!isset($_SESSION['indicum']) || strlen($_SESSION['indicum']) != 32)
-        //     $_SESSION['indicum'] = indicum();
-        // define('CSRF', $_SESSION['indicum']);
         define('CSRF', $this->session);
 
         $REQ = explode('/', $REQUEST);
@@ -69,39 +48,32 @@ class core
         $this->data['js'] = $this->asset(ASSETS, 'js', true);
         $this->data['css'] = $this->asset(ASSETS, 'css', true);
     }
+    function manifest($list, $type)
+    {
+        foreach ($list as $inc)
+            $manifest[] = external($inc) ? exist($inc) : cache($inc);
+
+        $manifest_content = implode("\n", $manifest);
+
+        $hash = md5($manifest_content);
+        $file = SERVER['PUB'] . '/.manifest/' . $hash;
+        if (!isReadable($file)) {
+            $manifest_file = fopen($file, "w") or die("Unable to open file!");
+            fwrite($manifest_file, $manifest_content);
+            fclose($manifest_file);
+        }
+        print $this->_include($type, $hash . '.manifest.' . $type) . PHP_EOL;
+    }
     function get($type = 'css' || 'js')
     {
         if (!isset($this->data[$type])) return;
+
+        if (PRODUCTION) return $this->manifest($this->data[$type], $type);
+
         foreach ($this->data[$type] as $inc) {
             $inc = external($inc) ? exist($inc) : cache($inc);
             if ($inc != false) print $this->_include($type, $inc) . PHP_EOL;
-
-            // if ($inc != false) echo $type == 'css' ? '<link rel="stylesheet" href="' . $inc . '">' . PHP_EOL : '<script defer src="' . $inc . '"></script>' . PHP_EOL;
         }
-
-        if ($type == 'js' && isset($_COOKIE['production']) && $_COOKIE['production'] == 'off')
-            echo
-            '
-            <script>
-                var div = document.createElement("div");
-                div.setAttribute("id","DevelopmentMode");
-                div.style.position = "fixed";
-                div.style.cursor = "pointer";
-                div.style.top = "0";
-                div.style.right = "0";
-                div.style.padding = ".25rem";
-                div.style.background = "red";
-                div.style.color = "white";
-                div.innerHTML = "&times; Development mode!";
-                document.documentElement.appendChild(div);
-                document.getElementById("DevelopmentMode").onclick = function jsFunc() {
-                    const d = new Date();
-                    d.setTime(d.getTime() - 1000);
-                    document.cookie = "production=on;expires=" + d.toUTCString() + ";path=/";
-                    location.reload();
-                }
-            </script>
-            ';
     }
     public function asset($array, $extension = 'css' | 'js', $return = false)
     {
