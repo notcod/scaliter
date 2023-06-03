@@ -137,7 +137,8 @@ function sanitize($buffer)
 {
     if (isset($_GET['sanitize'])) return $buffer;
     $buffer = preg_replace(['/\>[^\S]+/s', '/[^\S]+\</s', '/(\s)+/s', '/<!--(.|\s)*?-->/'], ['>', '<', '\\1', ''], $buffer);
-    return str_replace(PHP_EOL, '', $buffer);
+    return $buffer;
+    // return str_replace(PHP_EOL, '', $buffer);
 }
 function md6($q)
 {
