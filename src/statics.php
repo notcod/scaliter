@@ -7,7 +7,30 @@ class statics
         header('Content-Type: ' . STATIC_FILES[$extension]);
 
         $static = str_replace(['//', '../'], '/', $static);
+
+        if (str_ends_with($static, '.manifest.js') || str_ends_with($static, '.manifest.css')) {
+            $manifest = str_replace(['.manifest.js', '.manifest.css'], '', $static);
+
+            $file = SERVER['PUB'] . '/.manifest/' . $manifest;
+
+            $manifest_file = fopen($file, "r") or die("Unable to open file!");
+            $manifest_content = fread($manifest_file, filesize($file));
+            fclose($manifest_file);
+
+            $files = explode("\n", $manifest_content);
+
+            $manifest_files = [];
+            foreach ($files as $value)
+                if (!is_null($value) && $value !== '') $manifest_files[] = SERVER['PUB']  . substr($value, 0, strpos($value, "?"));
+
+            $uglify = new \NodejsPhpFallback\Uglify(
+                $manifest_files
+            );
+            exit($uglify);
+        }
+
         $file = SERVER['PUB'] . '/' . $static;
+
 
         if (file_exists($file)) {
             if (!in_array($extension, MINIMIZE_FILES)) exit(file_get_contents($file));
