@@ -80,13 +80,13 @@ class database
 
 		return $output;
 	}
-	function req_confirm($queries = [])
+	function req_confirm($queries = [], $non_inverse = true)
 	{
 		$output = [];
 		$output['errors'] = [];
 
 		foreach ($queries as $v => $s) {
-			$query =  $this->check($v);
+			$query =  $non_inverse ? $this->check($v) : !$this->check($v);
 			if (!$query)
 				$output['errors'][] = $s;
 
