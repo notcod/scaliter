@@ -9,8 +9,8 @@
     "license": "MIT",
     "autoload": {
         "files": [
-            "src/config.php",
-            "src/functions.php"
+            "src/functions.php",
+            "src/config.php"
         ],
         "psr-4": {
             "": "src/"
