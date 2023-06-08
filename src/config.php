@@ -6,7 +6,7 @@ error_reporting(~0);
 
 setlocale(LC_ALL, 'en_US.UTF-8');
 
-if (!defined('IP')) define('IP', ip());
+if (!defined('IP')) define('IP'," ip()");
 
 if (!defined('STATIC_FILES')) define('STATIC_FILES', [
     'js'    => 'application/javascript',

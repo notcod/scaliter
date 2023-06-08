@@ -28,7 +28,7 @@ function isReadable($FILE)
 }
 function cache($url)
 {
-    $FILE = SERVER['PUB'] . $url;
+    $FILE = SERVER  .  '/public'  . $url;
     if (isReadable($FILE))
         return $url . '?' . md6(filemtime($FILE));
     return false;
@@ -37,7 +37,7 @@ function section($data)
 {
     if (empty($data['view']) || empty($data['page'])) return;
 
-    $FILE = SERVER['APP'] . "/views/$data[view]/$data[page].php";
+    $FILE = SERVER . "/views/$data[view]/$data[page].php";
     if (isReadable($FILE))
         require_once($FILE);
 }
@@ -69,13 +69,6 @@ function exist($url)
 function server()
 {
     return gethostbyname(gethostname());
-}
-function PRODUCTION()
-{
-    return gethostname() != DEVELOPMENT_HOSTNAME;
-    // return gethostname() != 'nemanja';
-    // return !in_array($_SERVER['REMOTE_ADDR'], array('127.0.0.1', '::1'));
-    // return substr(server(), 0, 5) != '127.0';
 }
 function is_cli()
 {
@@ -185,7 +178,7 @@ function req_errors($req)
 }
 function load_section($s, $init = null)
 {
-    include SERVER['APP'] . '/section/' . $s . '.php';
+    include SERVER . '/section/' . $s . '.php';
 }
 
 
@@ -469,7 +462,7 @@ function content($part, $data)
 }
 function section_html($data)
 {
-    if(empty($data['page'])) return;
+    if (empty($data['page'])) return;
 
     return content($data['view'] . '/' . $data['page'] . '.html', $data);
 }
@@ -483,15 +476,15 @@ function uncache($f)
     $FILE_name = array_pop($FILE_NAMES);
     $FILE_NAMES = implode('/', $FILE_NAMES);
 
-    $FILE = SERVER['PUB'] . $FILE_NAMES . "/" . md5($FILE_name . ".min.js") . '.Cycler.js';
+    $FILE = SERVER  .  '/public'  . $FILE_NAMES . "/" . md5($FILE_name . ".min.js") . '.Cycler.js';
     if (is_file($FILE) && is_readable($FILE) && filesize($FILE) != 0)
         return $FILE_NAMES . "/" . md5($FILE_name . ".min.js") . '.Cycler.js' . '?' . md6(filemtime($FILE));
 
-    $FILE = SERVER['PUB'] . $FILE_NAMES . "/" . md5($FILE_name . ".min.css") . '.Cycler.css';
+    $FILE = SERVER  .  '/public'  . $FILE_NAMES . "/" . md5($FILE_name . ".min.css") . '.Cycler.css';
     if (is_file($FILE) && is_readable($FILE) && filesize($FILE) != 0)
         return $FILE_NAMES . "/" . md5($FILE_name . ".min.css") . '.Cycler.css' . '?' . md6(filemtime($FILE));
 
-    $FILE = SERVER['PUB'] . $f;
+    $FILE = SERVER  .  '/public'  . $f;
     if (is_file($FILE) && is_readable($FILE) && filesize($FILE) != 0)
         return $f . '?' . md6(filemtime($FILE));
 
@@ -499,14 +492,14 @@ function uncache($f)
 }
 function getFile($f, $data = [])
 {
-    // if (!file_exists(SERVER['PUB'] . $f)) return false;
-    if (!file_exists(SERVER['PUB'] . $f)) pathFile(SERVER['PUB'] . $f);
+    // if (!file_exists(SERVER  .  '/public'  . $f)) return false;
+    if (!file_exists(SERVER  .  '/public'  . $f)) pathFile(SERVER  .  '/public'  . $f);
     if ($f == ".php") return false;
     if ($f == ".js") return false;
     if ($f == ".css") return false;
     //if(strlen($f) < 5) return false;
     if (extension($f) == "php")
-        require_once(SERVER['PUB'] . $f);
+        require_once(SERVER  .  '/public'  . $f);
     else
         return uncache($f);
 }

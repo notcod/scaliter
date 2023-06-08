@@ -58,7 +58,7 @@ class core
         $manifest_content = implode("\n", $manifest);
 
         $hash = md5($manifest_content);
-        $file = SERVER['PUB'] . '/.manifest/' . $hash;
+        $file = SERVER . '/public/.manifest/' . $hash;
         if (!isReadable($file)) {
             $manifest_file = fopen($file, "w") or die("Unable to open file!");
             fwrite($manifest_file, $manifest_content);
@@ -72,7 +72,7 @@ class core
 
         if (defined("ONEFILE")) {
             array_walk($this->data[$type], function (&$val, $key) {
-                $val = SERVER['PUB'] . $val;
+                $val = SERVER . '/public' . $val;
             });
             $uglify = new \NodejsPhpFallback\Uglify($this->data[$type]);
             print $type == 'css' ? '<style>' . $uglify . '</style>' : '<script>' . $uglify . '</script>';
@@ -129,7 +129,7 @@ class core
         $this->confirm();
 
         $data = $this->data;
-        $FILE = SERVER['APP'] . "/views/$data[view].php";
+        $FILE = SERVER . "/views/$data[view].php";
         if (isReadable($FILE)) require_once($FILE);
     }
     private function confirm()
