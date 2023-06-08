@@ -5,15 +5,15 @@ class controller
     public $DB, $IP, $data, $_req;
     public function __construct()
     {
-        $this->IP = USER['IP'];
+        $this->IP = IP;
         $this->DB = new database();
     }
     public function view($arr = [])
     {
         $this->data['style'] = $this->data['style'] ?? [];
         $this->data['script'] = $this->data['script'] ?? [];
-        $this->data['description'] = $arr['description'] ?? SITE['NAME'];
-        $this->data['keywords'] = $arr['keywords'] ?? SITE['NAME'];
+        $this->data['description'] = $arr['description'] ?? SITE_NAME;
+        $this->data['keywords'] = $arr['keywords'] ?? SITE_NAME;
         $this->data['page'] = $arr['page'] ?? (debug_backtrace())[1]['function'];
         $this->data['view'] = strtolower($arr['view'] ?? substr(get_class($this), strrpos(get_class($this), '\\') + 1));
 

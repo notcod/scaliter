@@ -3,7 +3,7 @@
 class database
 {
 	public $DB, $sql;
-	function __construct($host = DB['HOST'], $user = DB['USER'], $pass = DB['PASS'], $name = DB['NAME'])
+	function __construct($host = DB_HOST, $user = DB_USER, $pass = DB_PASS, $name = DB_NAME)
 	{
 		$this->DB = new \mysqli($host, $user, $pass, $name);
 

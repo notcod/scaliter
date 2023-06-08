@@ -185,21 +185,21 @@ class core
         $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
         try {
             $mail->isSMTP();
-            $mail->Host   = EMAIL['HOST'];
+            $mail->Host   = EMAIL_HOST;
             $mail->SMTPAuth   = true;
-            $mail->Username   = EMAIL['USER'];
-            $mail->Password   = EMAIL['PASS'];
+            $mail->Username   = EMAIL_USER;
+            $mail->Password   = EMAIL_PASS;
             $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port   = 587;
-            $mail->setFrom(EMAIL['USER'], EMAIL['NAME']);
-            $mail->addReplyTo(EMAIL['USER'], EMAIL['NAME']);
+            $mail->setFrom(EMAIL_USER, EMAIL_NAME);
+            $mail->addReplyTo(EMAIL_USER, EMAIL_NAME);
             $mail->addAddress($recipient);
             $mail->isHTML(false);
             $mail->Subject = $subject;
             $mail->Body = $message;
             $mail->AltBody = \Soundasleep\Html2Text::convert($mail->Body, ['ignore_errors' => true]);
-            $mail->addCustomHeader('List-Unsubscribe', '<' . SITE['SUPPORT'] . '>, <https://' . SITE['DOMAIN'] . '/?unsubscribe=' . $recipient . '>');
-            $mail->XMailer = SITE['NAME'];
+            $mail->addCustomHeader('List-Unsubscribe', '<' . SITE_SUPPORT . '>, <https://' . SITE_DOMAIN . '/?unsubscribe=' . $recipient . '>');
+            $mail->XMailer = SITE_NAME;
             return $mail->send();
         } catch (\Exception $e) {
             return "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";

@@ -9,7 +9,7 @@ class DB
 
     public static function connection()
     {
-        self::$CONN = new \mysqli(DB['HOST'], DB['USER'], DB['PASS'], DB['NAME']);
+        self::$CONN = new \mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
         if (self::$CONN->connect_error)
             die("Connection failed: " . self::$CONN->connect_error);
@@ -56,6 +56,7 @@ class DB
     }
     public static function select(array|string $SELECT)
     {
+        if(empty($SELECT)) die("SELECT IS EMPTY");
         //if empty throw
         $TABLE = self::$TABLE;
         $WHERE = self::$WHERE;
@@ -66,6 +67,8 @@ class DB
     }
     public static function insert($INSERT = [])
     {
+        if(empty($INSERT)) die("SELECT IS EMPTY");
+
         //if empty throw
         $TABLE = self::$TABLE;
 
