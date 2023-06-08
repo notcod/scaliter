@@ -8,11 +8,12 @@
     },
     "license": "MIT",
     "autoload": {
+        "files": [
+            "src/config.php",
+            "src/functions.php"
+        ],
         "psr-4": {
             "": "src/"
-        },
-        "files": [
-            "src/functions.php"
-        ]
+        }
     }
 }
