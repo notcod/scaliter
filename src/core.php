@@ -5,9 +5,11 @@ class core
     public $data, $session;
     public function __construct($REQUEST = '', $rewrite = [])
     {
+        \DB::connection();
+
         $this->session = $_COOKIE[session_name()] ?? 'undefined';
         $extension = pathinfo($REQUEST, PATHINFO_EXTENSION);
-        if (array_key_exists($extension, STATIC_FILES)) exit(new statics($REQUEST, $extension));
+        if (array_key_exists($extension, STATIC_FILES)) exit($this->statics($REQUEST, $extension));
 
         if (PRODUCTION) ob_start('sanitize');
 
@@ -202,5 +204,70 @@ class core
         } catch (\Exception $e) {
             return "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
         }
+    }
+    private function statics($static, $extension)
+    {
+
+        $directory = SERVER . '/public';
+
+        header('Content-Type: ' . STATIC_FILES[$extension]);
+
+        $static = str_replace(['//', '../'], '/', $static);
+
+        if (str_ends_with($static, '.manifest.js') || str_ends_with($static, '.manifest.css')) {
+            $manifest = str_replace(['.manifest.js', '.manifest.css'], '', $static);
+
+            $file = $directory . '/.manifest/' . $manifest;
+
+            $manifest_file = fopen($file, "r") or die("Unable to open file!");
+            $manifest_content = fread($manifest_file, filesize($file));
+            fclose($manifest_file);
+
+            $files = explode("\n", $manifest_content);
+
+            $manifest_files = [];
+            foreach ($files as $value)
+                if (!is_null($value) && $value !== '') $manifest_files[] = $directory  . substr($value, 0, strpos($value, "?"));
+
+            $uglify = new \NodejsPhpFallback\Uglify(
+                $manifest_files
+            );
+            exit($uglify);
+        }
+
+        $file = $directory . '/' . $static;
+
+
+        if (file_exists($file)) {
+            if (!in_array($extension, MINIMIZE_FILES)) exit(file_get_contents($file));
+
+            $uglify = new \NodejsPhpFallback\Uglify([
+                $file
+            ]);
+            exit($uglify);
+        }
+
+        if (in_array($extension, ['ico', 'jpg', 'jpeg', 'png', 'gif'])) {
+            $image = imagecreatetruecolor(16, 16);
+            imagepng($image);
+            exit;
+        }
+
+        if ($extension == 'zip') {
+            $dumb_name = explode('/', $static);
+            $dumb_name = end($dumb_name);
+            $dumb_file = __DIR__ . '/dumb/dumb.zip';
+            header("Content-Type: application/zip");
+            header("Content-Transfer-Encoding: Binary");
+            header("Content-Length: " . filesize($dumb_file));
+            header("Content-Disposition: attachment; filename=\"" . basename($dumb_name) . "\"");
+            readfile($dumb_file);
+        }
+
+        if ($extension == 'xml') {
+            $dumb_file = __DIR__ . '/dumb/dumb.xml';
+            readfile($dumb_file);
+        }
+        exit;
     }
 }
