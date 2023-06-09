@@ -19,8 +19,8 @@ class DB
     }
     public static function query(string $SQL)
     {
-        self::$TABLE = null; 
-        self::$WHERE = null; 
+        self::$TABLE = null;
+        self::$WHERE = null;
         self::$ERROR = null;
 
         try {
@@ -37,7 +37,7 @@ class DB
 
         return $result;
     }
-    public static function esacpe(string $STRING)
+    public static function escape(string $STRING)
     {
         return self::$CONN->real_escape_string($STRING);
     }
@@ -51,25 +51,27 @@ class DB
         self::$ERROR = $ERROR;
         return new self;
     }
-    public static function where(array $WHERE)
+    public static function where(array|string $WHERE)
     {
         self::$WHERE = $WHERE ? 'WHERE ' : '';
 
-        foreach ($WHERE as $key => $val)
-            self::$WHERE .= "$key = '$val' AND ";
+        if (is_array($WHERE)) {
+            foreach ($WHERE as $key => $val)
+                self::$WHERE .= "$key = '$val' AND ";
 
-        self::$WHERE = substr(self::$WHERE, 0, -5);
+            self::$WHERE = substr(self::$WHERE, 0, -5);
+        } else {
+            self::$WHERE .= $WHERE;
+        }
 
         return new self;
     }
-    public static function select(array|string $SELECT)
+    public static function select(array $SELECT = [])
     {
-        if (empty($SELECT)) die("SELECT IS EMPTY");
-
         $TABLE = self::$TABLE;
         $WHERE = self::$WHERE;
 
-        $SELECT = is_array($SELECT) ? implode(', ', $SELECT) : '*';
+        $SELECT = count($SELECT) ? implode(', ', $SELECT) : '*';
 
         return (new self)->query("SELECT $SELECT FROM $TABLE $WHERE")->fetch_all(MYSQLI_ASSOC);
     }
@@ -108,10 +110,12 @@ class DB
 
         return (new self)->query("UPDATE $TABLE SET $SET $WHERE");
     }
-    public static function fetch(string $FETCH)
+    public static function fetch(string|array $FETCH)
     {
         $TABLE = self::$TABLE;
         $WHERE = self::$WHERE;
+
+        if(is_array($FETCH)) $FETCH = implode(', ', $FETCH);
 
         return (new self)->query("SELECT $FETCH FROM $TABLE $WHERE LIMIT 1")->fetch_array(MYSQLI_ASSOC);
     }
@@ -123,7 +127,7 @@ class DB
     }
     public static function count(string $COUNT = 'id')
     {
-        return (new self)->fetch("count($COUNT)");
+        return (new self)->get("count($COUNT)");
     }
     public static function confirm($RESULT = true)
     {

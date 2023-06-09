@@ -2,12 +2,8 @@
 
 class controller
 {
-    public $DB, $IP, $data, $_req;
-    public function __construct()
-    {
-        $this->IP = IP;
-        $this->DB = new database();
-    }
+    public $data, $_req;
+
     public function view($arr = [])
     {
         $this->data['style'] = $this->data['style'] ?? [];
@@ -30,7 +26,7 @@ class controller
                         foreach ($fu as $fc) $val = call_user_func_array($fc, [$val]);
                     else
                         $val = call_user_func_array($fu, [$val]);
-            $this->_req[clean($variable)] = $this->DB->escape($val);
+            $this->_req[clean($variable)] = \DB::escape($val);
         }
     }
     public function setArray($z)
@@ -50,8 +46,6 @@ class controller
         $output = ['message' => $data, "error" => false];
         if (is_array($data))
             $output = isset($data['success']) ? ['message' => $data["success"], "error" => true] : ['message' => $data[0], 'field' => $data[1], "error" => false];
-        // die(json_encode($output));
-
 
         $output['error'] ? HTTPStatus(200) : HTTPStatus(202);
         unset($output['error']);
@@ -68,11 +62,5 @@ class controller
                 $r->_fields[] = $v;
             }
         return $r;
-    }
-
-    public function model($model)
-    {
-        $run = '\\model\\' . $model;
-        return new $run();
     }
 }

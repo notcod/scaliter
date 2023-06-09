@@ -143,23 +143,9 @@ class core
     }
     private function isRequest()
     {
-        // var_dump($this->session);
-        // var_dump(CSRF);
-        // exit;
-
-        // if (strpos($this->getHeader('ACCEPT'), 'application/json') === false) return false;
-
-        // if ($this->session == CSRF) return true;
-
-        // return $this->NOT_FOUND('Token is not valid!');
-
         return ($this->session == CSRF &&
             strpos($this->getHeader('ACCEPT'), 'application/json') !== false
         );
-
-        // return ($this->getHeader('INDICUM') == CSRF &&
-        //     strpos($this->getHeader('ACCEPT'), 'application/json') !== false
-        // );
     }
     private function getHeader($header)
     {
@@ -207,13 +193,9 @@ class core
     }
     private function statics($static, $extension)
     {
-
         $directory = SERVER . '/public';
-
         header('Content-Type: ' . STATIC_FILES[$extension]);
-
         $static = str_replace(['//', '../'], '/', $static);
-
         if (str_ends_with($static, '.manifest.js') || str_ends_with($static, '.manifest.css')) {
             $manifest = str_replace(['.manifest.js', '.manifest.css'], '', $static);
 
@@ -234,10 +216,7 @@ class core
             );
             exit($uglify);
         }
-
         $file = $directory . '/' . $static;
-
-
         if (file_exists($file)) {
             if (!in_array($extension, MINIMIZE_FILES)) exit(file_get_contents($file));
 
@@ -246,13 +225,11 @@ class core
             ]);
             exit($uglify);
         }
-
         if (in_array($extension, ['ico', 'jpg', 'jpeg', 'png', 'gif'])) {
             $image = imagecreatetruecolor(16, 16);
             imagepng($image);
             exit;
         }
-
         if ($extension == 'zip') {
             $dumb_name = explode('/', $static);
             $dumb_name = end($dumb_name);
@@ -263,7 +240,6 @@ class core
             header("Content-Disposition: attachment; filename=\"" . basename($dumb_name) . "\"");
             readfile($dumb_file);
         }
-
         if ($extension == 'xml') {
             $dumb_file = __DIR__ . '/dumb/dumb.xml';
             readfile($dumb_file);
