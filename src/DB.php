@@ -6,6 +6,7 @@ class DB
 
     private static $TABLE = null;
     private static $WHERE = null;
+    private static $ERROR = null;
 
     public static function connection()
     {
@@ -16,26 +17,25 @@ class DB
 
         self::$CONN->set_charset("utf8mb4");
     }
-    public static function query($SQL)
+    public static function query(string $SQL)
     {
-        self::$TABLE = self::$WHERE = null;
+        self::$TABLE = null; 
+        self::$WHERE = null; 
+        self::$ERROR = null;
 
-        $SQL = trim($SQL);
+        try {
+            $result = self::$CONN->query($SQL);
+        } catch (Exception $e) {
+            die($e->getMessage() . "<br><i>[$SQL]</i>");
+        }
 
-        $DB = self::$CONN;
+        if (strpos($SQL, 'INSERT INTO') !== false)
+            return self::$CONN->insert_id;
 
-        $RESULT = $DB->query($SQL) or die("$DB->error => [$SQL]");
+        if (strpos($SQL, 'UPDATE') !== false)
+            return self::$CONN->affected_rows;
 
-        if ($DB->error)
-            throw new \Exception("$DB->error => [$SQL]");
-
-        if (strpos(strtoupper($SQL), 'INSERT INTO') !== false)
-            $RESULT = $DB->insert_id;
-
-        elseif (strpos(strtoupper($SQL), 'UPDATE') !== false)
-            $RESULT = $DB->affected_rows;
-
-        return $RESULT;
+        return $result;
     }
     public static function esacpe(string $STRING)
     {
@@ -44,7 +44,12 @@ class DB
     public static function table(string $TABLE)
     {
         self::$TABLE = $TABLE;
-        return new self();
+        return new self;
+    }
+    public static function error(string|array $ERROR)
+    {
+        self::$ERROR = $ERROR;
+        return new self;
     }
     public static function where(array $WHERE)
     {
@@ -55,7 +60,7 @@ class DB
 
         self::$WHERE = substr(self::$WHERE, 0, -5);
 
-        return new self();
+        return new self;
     }
     public static function select(array|string $SELECT)
     {
@@ -72,12 +77,16 @@ class DB
     {
         if (empty($INSERT)) die("SELECT IS EMPTY");
 
+        array_walk($INSERT, function (&$value, $key) {
+            $value = "'$value'";
+        });
+
         $TABLE = self::$TABLE;
 
         $KEY = implode(', ', array_keys($INSERT));
         $VAL = implode(', ', array_values($INSERT));
 
-        return (new self)->query("INSERT INTO $TABLE ($KEY) VALUES ('$VAL')");
+        return (new self)->query("INSERT INTO $TABLE ($KEY) VALUES ($VAL)");
     }
     public static function delete()
     {
@@ -106,14 +115,26 @@ class DB
 
         return (new self)->query("SELECT $FETCH FROM $TABLE $WHERE LIMIT 1")->fetch_array(MYSQLI_ASSOC);
     }
-    public static function check(string $CHECK)
+    public static function get(string $GET, $default = 0)
     {
-        $result = (new self)->check($CHECK);
-        $result = is_array($result) ? end($result) : 0;
-        return empty($result) ? 0 : $result;
+        $result = (new self)->fetch($GET);
+        $result = is_array($result) ? end($result) : $default;
+        return empty($result) ? $default : $result;
     }
     public static function count(string $COUNT = 'id')
     {
         return (new self)->fetch("count($COUNT)");
     }
+    public static function confirm($RESULT = true)
+    {
+        return (new self)->count() != $RESULT ? ['error' => self::$ERROR] : true;
+    }
+    // public static function confirm(array $QUERIES, $INVERSE = false)
+    // {
+    //     $OUTPUT = [];
+    //     $OUTPUT['errors'] = [];
+
+    //     foreach ($QUERIES as $QUERY => $ERROR) {
+    //     }
+    // }
 }
