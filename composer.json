@@ -13,7 +13,7 @@
             "src/config.php"
         ],
         "psr-4": {
-            "": "src/"
+            "scaliter\\": "src/"
         }
     }
 }
