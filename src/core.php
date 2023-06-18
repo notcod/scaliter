@@ -1,12 +1,12 @@
 <?php
 
+namespace scaliter;
+
 class core
 {
     public $data, $session;
     public function __construct($REQUEST = '', $rewrite = [])
     {
-        \DB::connection();
-
         $this->session = $_COOKIE[session_name()] ?? 'undefined';
         $extension = pathinfo($REQUEST, PATHINFO_EXTENSION);
         if (array_key_exists($extension, STATIC_FILES)) exit($this->statics($REQUEST, $extension));
