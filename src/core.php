@@ -17,7 +17,7 @@ class core
 
         $REQ = explode('/', $REQUEST);
 
-        $directory = $this->isRequest() ? 'handler' : 'controller';
+        $directory = $this->isRequest() ? 'model' : 'controller';
         $controller = 'home';
         $method = 'index';
 
@@ -43,9 +43,32 @@ class core
 
         if (!method_exists($CLASS, $method)) $this->NOT_FOUND('method not found => ' . $method);
 
-        $this->data = call_user_func_array([$CLASS, $method], array_values($REQ));
+        $CALL = call_user_func_array([$CLASS, $method], array_values($REQ)) ?? [];
+
+        if ($directory == 'model') {
+            header('Content-Type: application/json');
+            $output = ['message' => $CALL, 'success' => false];
+            if (is_array($CALL))
+                $output = isset($CALL['success']) ? ['message' => $CALL['success'], 'success' => true] : ['message' => $CALL[0], 'field' => $CALL[1], 'success' => false];
+
+            $output['success'] ? HTTPStatus(200) : HTTPStatus(202);
+            die(json_encode($output));
+        }
+
+        $this->data = $CLASS->data;
+
+        $this->data['page'] = $method;
+        $this->data['view'] = $controller;
 
         $this->confirm();
+
+        $this->data['style'] = $this->data['style'] ?? [];
+        $this->data['script'] = $this->data['script'] ?? [];
+
+        $this->data['description'] = $CALL['description'] ?? SITE_NAME;
+        $this->data['keywords'] = $CALL['keywords'] ?? SITE_NAME;
+
+        $this->data = array_merge($this->data, $CALL);
 
         $this->data['js'] = $this->asset(ASSETS, 'js', true);
         $this->data['css'] = $this->asset(ASSETS, 'css', true);
