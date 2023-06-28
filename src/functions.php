@@ -193,7 +193,11 @@ function load_section($s, $init = null)
 
 
 
-
+function dd($dump)
+{
+    var_dump($dump);
+    die;
+}
 
 
 
