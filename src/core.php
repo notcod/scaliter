@@ -66,8 +66,8 @@ class core
 
         $this->data = array_merge($this->data, $CALL);
 
-        $this->data['js'] = $this->asset(ASSETS, 'js', true);
-        $this->data['css'] = $this->asset(ASSETS, 'css', true);
+        $this->data['js'] = $this->asset(getCons('ASSETS'), 'js', true);
+        $this->data['css'] = $this->asset(getCons('ASSETS'), 'css', true);
     }
     private function typeOfRequest()
     {
@@ -87,7 +87,7 @@ class core
         $manifest_content = implode("\n", $manifest);
 
         $hash = md5($manifest_content);
-        $file = SERVER . '/public/.manifest/' . $hash;
+        $file = getCons('SERVER') . '/public/.manifest/' . $hash;
         if (!isReadable($file)) {
             $manifest_file = fopen($file, "w") or die("Unable to open file!");
             fwrite($manifest_file, $manifest_content);
@@ -101,7 +101,7 @@ class core
 
         if (defined("ONEFILE")) {
             array_walk($this->data[$type], function (&$val, $key) {
-                $val = SERVER . '/public' . $val;
+                $val = getCons('SERVER') . '/public' . $val;
             });
             $uglify = new \NodejsPhpFallback\Uglify($this->data[$type]);
             print $type == 'css' ? '<style>' . $uglify . '</style>' : '<script>' . $uglify . '</script>';
@@ -159,7 +159,7 @@ class core
         $this->confirm();
 
         $data = $this->data;
-        $FILE = SERVER . "/views/$data[view].php";
+        $FILE = getCons('SERVER') . "/views/$data[view].php";
         if (isReadable($FILE)) require_once($FILE);
     }
     private function confirm()
@@ -256,7 +256,7 @@ class core
     }
     private function statics($static, $extension)
     {
-        $directory = SERVER . '/public';
+        $directory = getCons('SERVER') . '/public';
         header('Content-Type: ' . $this->static_files($extension));
         $static = str_replace(['//', '../'], '/', $static);
         if (str_ends_with($static, '.manifest.js') || str_ends_with($static, '.manifest.css')) {

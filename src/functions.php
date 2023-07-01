@@ -52,7 +52,7 @@ function isReadable($FILE)
 }
 function cache($url)
 {
-    $FILE = SERVER  .  '/public'  . $url;
+    $FILE = getCons('SERVER')  .  '/public'  . $url;
     if (isReadable($FILE))
         return $url . '?' . md6(filemtime($FILE));
     return false;
@@ -61,7 +61,7 @@ function section($data)
 {
     if (empty($data['view']) || empty($data['page'])) return;
 
-    $FILE = SERVER . "/views/$data[view]/$data[page].php";
+    $FILE = getCons('SERVER') . "/views/$data[view]/$data[page].php";
     if (isReadable($FILE))
         require_once($FILE);
 }
@@ -202,7 +202,7 @@ function req_errors($req)
 }
 function load_section($s, $init = null)
 {
-    include SERVER . '/section/' . $s . '.php';
+    include getCons('SERVER') . '/section/' . $s . '.php';
 }
 
 function getBrowserInfo($return)
@@ -818,15 +818,15 @@ function uncache($f)
     $FILE_name = array_pop($FILE_NAMES);
     $FILE_NAMES = implode('/', $FILE_NAMES);
 
-    $FILE = SERVER  .  '/public'  . $FILE_NAMES . "/" . md5($FILE_name . ".min.js") . '.Cycler.js';
+    $FILE = getCons('SERVER')  .  '/public'  . $FILE_NAMES . "/" . md5($FILE_name . ".min.js") . '.Cycler.js';
     if (is_file($FILE) && is_readable($FILE) && filesize($FILE) != 0)
         return $FILE_NAMES . "/" . md5($FILE_name . ".min.js") . '.Cycler.js' . '?' . md6(filemtime($FILE));
 
-    $FILE = SERVER  .  '/public'  . $FILE_NAMES . "/" . md5($FILE_name . ".min.css") . '.Cycler.css';
+    $FILE = getCons('SERVER')  .  '/public'  . $FILE_NAMES . "/" . md5($FILE_name . ".min.css") . '.Cycler.css';
     if (is_file($FILE) && is_readable($FILE) && filesize($FILE) != 0)
         return $FILE_NAMES . "/" . md5($FILE_name . ".min.css") . '.Cycler.css' . '?' . md6(filemtime($FILE));
 
-    $FILE = SERVER  .  '/public'  . $f;
+    $FILE = getCons('SERVER')  .  '/public'  . $f;
     if (is_file($FILE) && is_readable($FILE) && filesize($FILE) != 0)
         return $f . '?' . md6(filemtime($FILE));
 
@@ -835,13 +835,13 @@ function uncache($f)
 function getFile($f, $data = [])
 {
     // if (!file_exists(SERVER  .  '/public'  . $f)) return false;
-    if (!file_exists(SERVER  .  '/public'  . $f)) pathFile(SERVER  .  '/public'  . $f);
+    if (!file_exists(getCons('SERVER')  .  '/public'  . $f)) pathFile(getCons('SERVER')  .  '/public'  . $f);
     if ($f == ".php") return false;
     if ($f == ".js") return false;
     if ($f == ".css") return false;
     //if(strlen($f) < 5) return false;
     if (extension($f) == "php")
-        require_once(SERVER  .  '/public'  . $f);
+        require_once(getCons('SERVER')  .  '/public'  . $f);
     else
         return uncache($f);
 }
