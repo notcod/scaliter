@@ -1,5 +1,29 @@
 <?php
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(~0);
+
+setlocale(LC_ALL, 'en_US.UTF-8');
+
+define('IP', ip());
+define('BROWSER', getBrowserInfo('content'));
+
+if (getCons('PRODUCTION')) {
+    ini_set('display_errors', 0);
+    ini_set('display_startup_errors', 0);
+}
+
+if (session_status() === PHP_SESSION_NONE) {
+    ini_set('session.cookie_lifetime', getCons('COOKIE_LIFETIME'));
+    ini_set('session.name', getCons('COOKIE_NAME')); #can't be same as domain
+    ini_set('session.sid_length', getCons('COOKIE_LENGTH'));
+    session_start();
+}
+
+
+
+##################################
 function indicum($indicum = '', $length = 32)
 {
     $indicum = preg_replace('/[^a-zA-Z0-9]+/', '', $indicum);
@@ -44,7 +68,7 @@ function section($data)
 function create($FILE)
 {
     if (file_exists($FILE)) return true;
-    if (PRODUCTION) return false;
+    if (getCons('PRODUCTION')) return false;
     $path = explode('/', $FILE);
     array_pop($path);
     $path = implode('/', $path);
@@ -181,11 +205,325 @@ function load_section($s, $init = null)
     include SERVER . '/section/' . $s . '.php';
 }
 
+function getBrowserInfo($return)
+{
+    if (!isset($_SERVER['HTTP_USER_AGENT'])) return null;
+
+    $u_agent = $_SERVER['HTTP_USER_AGENT'];
+    $bname = 'Unknown';
+    $platform = 'Unknown';
+    $version = "";
+
+    //First get the platform?
+    if (preg_match('/linux/i', $u_agent)) {
+        $platform = 'LINUX';
+    } elseif (preg_match('/macintosh|mac os x/i', $u_agent)) {
+        $platform = 'MAC';
+    } elseif (preg_match('/windows|win32/i', $u_agent)) {
+        $platform = 'WINDOWS';
+    }
+
+    // Next get the name of the useragent yes seperately and for good reason
+    if (preg_match('/MSIE/i', $u_agent) && !preg_match('/Opera/i', $u_agent)) {
+        $bname = 'Internet Explorer';
+        $ub = "MSIE";
+    } elseif (preg_match('/Firefox/i', $u_agent)) {
+        $bname = 'Mozilla Firefox';
+        $ub = "Firefox";
+    } elseif (preg_match('/Chrome/i', $u_agent)) {
+        $bname = 'Google Chrome';
+        $ub = "Chrome";
+    } elseif (preg_match('/Safari/i', $u_agent)) {
+        $bname = 'Apple Safari';
+        $ub = "Safari";
+    } elseif (preg_match('/Opera/i', $u_agent)) {
+        $bname = 'Opera';
+        $ub = "Opera";
+    } elseif (preg_match('/Netscape/i', $u_agent)) {
+        $bname = 'Netscape';
+        $ub = "Netscape";
+    }
+
+    // finally get the correct version number
+    $known = array('Version', $ub, 'other');
+    $pattern = '#(?<browser>' . join('|', $known) .
+        ')[/ ]+(?<version>[0-9.|a-zA-Z.]*)#';
+    if (!preg_match_all($pattern, $u_agent, $matches)) {
+        // we have no matching number just continue
+    }
+
+    // see how many we have
+    $i = count($matches['browser']);
+    if ($i != 1) {
+        //we will have two since we are not using 'other' argument yet
+        //see if version is before or after the name
+        if (strripos($u_agent, "Version") < strripos($u_agent, $ub)) {
+            $version = $matches['version'][0];
+        } else {
+            $version = $matches['version'][1];
+        }
+    } else {
+        $version = $matches['version'][0];
+    }
+
+    // check if we have a number
+    if ($version == null || $version == "") {
+        $version = "?";
+    }
+
+
+    $LANG = [
+        "aa" => "Afar",
+        "ab" => "Abkhazian",
+        "ae" => "Avestan",
+        "af" => "Afrikaans",
+        "ak" => "Akan",
+        "am" => "Amharic",
+        "an" => "Aragonese",
+        "ar" => "Arabic",
+        "as" => "Assamese",
+        "av" => "Avaric",
+        "ay" => "Aymara",
+        "az" => "Azerbaijani",
+        "ba" => "Bashkir",
+        "be" => "Belarusian",
+        "bg" => "Bulgarian",
+        "bh" => "Bihari languages",
+        "bi" => "Bislama",
+        "bm" => "Bambara",
+        "bn" => "Bengali",
+        "bo" => "Tibetan",
+        "br" => "Breton",
+        "bs" => "Bosnian",
+        "ca" => "Catalan; Valencian",
+        "ce" => "Chechen",
+        "ch" => "Chamorro",
+        "co" => "Corsican",
+        "cr" => "Cree",
+        "cs" => "Czech",
+        "cu" => "Church Slavic; Old Slavonic; Church Slavonic; Old Bulgarian; Old Church Slavonic",
+        "cv" => "Chuvash",
+        "cy" => "Welsh",
+        "da" => "Danish",
+        "de" => "German",
+        "dv" => "Divehi; Dhivehi; Maldivian",
+        "dz" => "Dzongkha",
+        "ee" => "Ewe",
+        "el" => "Greek, Modern (1453-)",
+        "en" => "English",
+        "eo" => "Esperanto",
+        "es" => "Spanish; Castilian",
+        "et" => "Estonian",
+        "eu" => "Basque",
+        "fa" => "Persian",
+        "ff" => "Fulah",
+        "fi" => "Finnish",
+        "fj" => "Fijian",
+        "fo" => "Faroese",
+        "fr" => "French",
+        "fy" => "Western Frisian",
+        "ga" => "Irish",
+        "gd" => "Gaelic; Scottish Gaelic",
+        "gl" => "Galician",
+        "gn" => "Guarani",
+        "gu" => "Gujarati",
+        "gv" => "Manx",
+        "ha" => "Hausa",
+        "he" => "Hebrew",
+        "hi" => "Hindi",
+        "ho" => "Hiri Motu",
+        "hr" => "Croatian",
+        "ht" => "Haitian; Haitian Creole",
+        "hu" => "Hungarian",
+        "hy" => "Armenian",
+        "hz" => "Herero",
+        "ia" => "Interlingua (International Auxiliary Language Association)",
+        "id" => "Indonesian",
+        "ie" => "Interlingue; Occidental",
+        "ig" => "Igbo",
+        "ii" => "Sichuan Yi; Nuosu",
+        "ik" => "Inupiaq",
+        "io" => "Ido",
+        "is" => "Icelandic",
+        "it" => "Italian",
+        "iu" => "Inuktitut",
+        "ja" => "Japanese",
+        "jv" => "Javanese",
+        "ka" => "Georgian",
+        "kg" => "Kongo",
+        "ki" => "Kikuyu; Gikuyu",
+        "kj" => "Kuanyama; Kwanyama",
+        "kk" => "Kazakh",
+        "kl" => "Kalaallisut; Greenlandic",
+        "km" => "Central Khmer",
+        "kn" => "Kannada",
+        "ko" => "Korean",
+        "kr" => "Kanuri",
+        "ks" => "Kashmiri",
+        "ku" => "Kurdish",
+        "kv" => "Komi",
+        "kw" => "Cornish",
+        "ky" => "Kirghiz; Kyrgyz",
+        "la" => "Latin",
+        "lb" => "Luxembourgish; Letzeburgesch",
+        "lg" => "Ganda",
+        "li" => "Limburgan; Limburger; Limburgish",
+        "ln" => "Lingala",
+        "lo" => "Lao",
+        "lt" => "Lithuanian",
+        "lu" => "Luba-Katanga",
+        "lv" => "Latvian",
+        "mg" => "Malagasy",
+        "mh" => "Marshallese",
+        "mi" => "Maori",
+        "mk" => "Macedonian",
+        "ml" => "Malayalam",
+        "mn" => "Mongolian",
+        "mr" => "Marathi",
+        "ms" => "Malay",
+        "mt" => "Maltese",
+        "my" => "Burmese",
+        "na" => "Nauru",
+        "nb" => "Bokmål, Norwegian; Norwegian Bokmål",
+        "nd" => "Ndebele, North; North Ndebele",
+        "ne" => "Nepali",
+        "ng" => "Ndonga",
+        "nl" => "Dutch; Flemish",
+        "nn" => "Norwegian Nynorsk; Nynorsk, Norwegian",
+        "no" => "Norwegian",
+        "nr" => "Ndebele, South; South Ndebele",
+        "nv" => "Navajo; Navaho",
+        "ny" => "Chichewa; Chewa; Nyanja",
+        "oc" => "Occitan (post 1500)",
+        "oj" => "Ojibwa",
+        "om" => "Oromo",
+        "or" => "Oriya",
+        "os" => "Ossetian; Ossetic",
+        "pa" => "Panjabi; Punjabi",
+        "pi" => "Pali",
+        "pl" => "Polish",
+        "ps" => "Pushto; Pashto",
+        "pt" => "Portuguese",
+        "qu" => "Quechua",
+        "rm" => "Romansh",
+        "rn" => "Rundi",
+        "ro" => "Romanian; Moldavian; Moldovan",
+        "ru" => "Russian",
+        "rw" => "Kinyarwanda",
+        "sa" => "Sanskrit",
+        "sc" => "Sardinian",
+        "sd" => "Sindhi",
+        "se" => "Northern Sami",
+        "sg" => "Sango",
+        "si" => "Sinhala; Sinhalese",
+        "sk" => "Slovak",
+        "sl" => "Slovenian",
+        "sm" => "Samoan",
+        "sn" => "Shona",
+        "so" => "Somali",
+        "sq" => "Albanian",
+        "sr" => "Serbian",
+        "ss" => "Swati",
+        "st" => "Sotho, Southern",
+        "su" => "Sundanese",
+        "sv" => "Swedish",
+        "sw" => "Swahili",
+        "ta" => "Tamil",
+        "te" => "Telugu",
+        "tg" => "Tajik",
+        "th" => "Thai",
+        "ti" => "Tigrinya",
+        "tk" => "Turkmen",
+        "tl" => "Tagalog",
+        "tn" => "Tswana",
+        "to" => "Tonga (Tonga Islands)",
+        "tr" => "Turkish",
+        "ts" => "Tsonga",
+        "tt" => "Tatar",
+        "tw" => "Twi",
+        "ty" => "Tahitian",
+        "ug" => "Uighur; Uyghur",
+        "uk" => "Ukrainian",
+        "ur" => "Urdu",
+        "uz" => "Uzbek",
+        "ve" => "Venda",
+        "vi" => "Vietnamese",
+        "vo" => "Volapük",
+        "wa" => "Walloon",
+        "wo" => "Wolof",
+        "xh" => "Xhosa",
+        "yi" => "Yiddish",
+        "yo" => "Yoruba",
+        "za" => "Zhuang; Chuang",
+        "zh" => "Chinese",
+        "zu" => "Zulu"
+    ];
+    $languages = [];
+    $accept_language = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
+    $language = explode(';', $accept_language);
+    foreach ($language as $lan) {
+        $lang = explode(",", $lan);
+        $lang = end($lang);
+        if (key_exists($lang, $LANG)) $languages[$lang] = $LANG[$lang];
+    }
+
+    $output = array(
+        'userAgent' => $u_agent,
+        'name'      => $bname,
+        'version'   => $version,
+        'platform'  => $platform,
+        'languages'    => $languages,
+        'content' => $platform . ' - ' . $bname . ' ' . $version,
+        'content_full' => $platform . ' - ' . $bname . ' ' . $version . ' - Lang: ' . implode(',', array_keys($languages))
+    );
+    return $output[$return];
+}
 
 
 
 
 
+// function setCons($name, $value)
+// {
+//     if (defined($name))
+//         die("Constant $name can't be defined!");
+
+//     if ($value === 'false' || $value == 0) $value = false;
+//     if ($value === 'true'  || $value == 1) $value = true;
+
+//     define($name, $value);
+
+//     return $value;
+// }
+// function getCons($name, $ignore_if_not_defined = true)
+// {
+//     $isDefined = defined($name);
+
+//     if(!$ignore_if_not_defined && !$isDefined) die("Constant $name isn't defined!");
+
+//     return $isDefined ? constant($name) : false;
+// }
+
+function setCons($name, $value)
+{
+    if (isset($_ENV[$name]))
+        die("Constant $name can't be defined!");
+
+    if ($value === 'false' || $value == 0) $value = false;
+    if ($value === 'true'  || $value == 1) $value = true;
+
+    $_ENV[$name] = $value;
+
+    return $value;
+}
+function getCons($name, $ignore_if_not_defined = true)
+{
+    $isDefined = isset($_ENV[$name]);
+
+    if(!$ignore_if_not_defined && !$isDefined) die("Constant $name isn't defined!");
+
+    return $isDefined ? $_ENV[$name] : false;
+}
 
 
 

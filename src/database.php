@@ -9,10 +9,11 @@ class database
     private static $TABLE = null;
     private static $WHERE = null;
     private static $ERROR = null;
+    private static $LIMIT = null;
 
     public static function connection()
     {
-        self::$CONNE = new \mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+        self::$CONNE = new \mysqli(getCons('DB_HOST'), getCons('DB_USER'), getCons('DB_PASS'), getCons('DB_NAME'));
 
         if (self::$CONNE->connect_error)
             die("Connection failed: " . self::$CONNE->connect_error);
@@ -21,13 +22,14 @@ class database
     }
     public static function query(string $SQL)
     {
-        if(self::$CONNE == null) self::connection();
+        if (self::$CONNE == null) self::connection();
 
         if (self::$dumpe) die($SQL);
 
         self::$TABLE = null;
         self::$WHERE = null;
         self::$ERROR = null;
+        self::$LIMIT = null;
         self::$dumpe = null;
 
         try {
@@ -66,6 +68,17 @@ class database
     private static function isWhere()
     {
         return empty(self::$WHERE) || self::$WHERE == null ? '' : 'WHERE ' . self::$WHERE;
+    }
+    private static function isLimit()
+    {
+        return empty(self::$LIMIT) || self::$LIMIT == null ? '' : 'LIMIT ' . self::$LIMIT[0] . ', ' . self::$LIMIT[1];
+    }
+    public static function limit($results, $page = 1)
+    {
+        $page = ints($page);
+        if ($page <= 0) $page = 1;
+        self::$LIMIT = [($page - 1) * $results, $results];
+        return new self;
     }
     private static function buildWhere(string $indicator)
     {
@@ -107,10 +120,11 @@ class database
     {
         $TABLE = self::$TABLE;
         $WHERE = self::isWhere();
+        $LIMIT = self::isLimit();
 
         $SELECT = count($SELECT) ? implode(', ', $SELECT) : '*';
 
-        return (new self)->query("SELECT $SELECT FROM $TABLE $WHERE")->fetch_all(MYSQLI_ASSOC);
+        return (new self)->query("SELECT $SELECT FROM $TABLE $WHERE $LIMIT")->fetch_all(MYSQLI_ASSOC);
     }
     public static function insert(array $INSERT)
     {

@@ -7,17 +7,19 @@ class core
     public $data, $session;
     public function __construct($REQUEST = '', $rewrite = [])
     {
-        $this->session = $_COOKIE[session_name()] ?? 'undefined';
+
+        $this->session = $_COOKIE[session_name()] ?? null;
         $extension = pathinfo($REQUEST, PATHINFO_EXTENSION);
-        if (array_key_exists($extension, STATIC_FILES)) exit($this->statics($REQUEST, $extension));
+        if ($this->static_files($extension)) exit($this->statics($REQUEST, $extension));
 
-        if (PRODUCTION) ob_start('sanitize');
+        if (getCons('PRODUCTION')) ob_start('sanitize');
 
-        define('CSRF', $this->session);
+        define('CSRF', $this->getHeaderCookie(session_name()));
 
         $REQ = explode('/', $REQUEST);
 
-        $directory = $this->isRequest() ? 'model' : 'controller';
+        // $directory = $this->isRequest() ? 'model' : 'controller';
+        $directory = $this->typeOfRequest();
         $controller = 'home';
         $method = 'index';
 
@@ -45,15 +47,9 @@ class core
 
         $CALL = call_user_func_array([$CLASS, $method], array_values($REQ)) ?? [];
 
-        if ($directory == 'model') {
-            header('Content-Type: application/json');
-            $output = ['message' => $CALL, 'success' => false];
-            if (is_array($CALL))
-                $output = isset($CALL['success']) ? ['message' => $CALL['success'], 'success' => true] : ['message' => $CALL[0], 'field' => $CALL[1], 'success' => false];
+        if ($directory == 'model') is_array($CALL) ? error($CALL[0], $CALL[1] ?? '') : error($CALL);
 
-            $output['success'] ? HTTPStatus(200) : HTTPStatus(202);
-            die(json_encode($output));
-        }
+        if ($directory == 'json') json_print($CALL);
 
         $this->data = $CLASS->data;
 
@@ -65,13 +61,23 @@ class core
         $this->data['style'] = $this->data['style'] ?? [];
         $this->data['script'] = $this->data['script'] ?? [];
 
-        $this->data['description'] = $CALL['description'] ?? SITE_NAME;
-        $this->data['keywords'] = $CALL['keywords'] ?? SITE_NAME;
+        $this->data['description'] = $CALL['description'] ?? getCons('SITE_NAME');
+        $this->data['keywords'] = $CALL['keywords'] ?? getCons('SITE_NAME');
 
         $this->data = array_merge($this->data, $CALL);
 
         $this->data['js'] = $this->asset(ASSETS, 'js', true);
         $this->data['css'] = $this->asset(ASSETS, 'css', true);
+    }
+    private function typeOfRequest()
+    {
+        if (!$this->isRequest()) return 'controller';
+
+        if ($this->session == CSRF && $this->getHeader('ACCEPT_RESPONSE') == 'bool/response') return 'model';
+
+        if ($this->session == CSRF && $this->getHeader('ACCEPT_RESPONSE') == 'text/json') return 'json';
+
+        $this->NOT_FOUND('Missmatched creditinails');
     }
     function manifest($list, $type)
     {
@@ -102,7 +108,7 @@ class core
             return;
         }
 
-        if (PRODUCTION) return $this->manifest($this->data[$type], $type);
+        if (getCons('PRODUCTION')) return $this->manifest($this->data[$type], $type);
 
         foreach ($this->data[$type] as $inc) {
             $inc = external($inc) ? exist($inc) : cache($inc);
@@ -118,6 +124,12 @@ class core
         $type = $extension == 'css' ? 'style' : 'script';
         $data[$type][] = $data['view'];
         $includes = [];
+
+        $init_assets = $array[$extension]['init'] ?? [];
+        if (count($init_assets))
+            foreach ($init_assets as $init)
+                $includes[] = $init;
+
         if (isset($data[$type]) && count($data[$type]))
             foreach ($data[$type] as $asset)
                 if (is_array($array[$extension]) && array_key_exists($asset, $array[$extension]))
@@ -126,11 +138,6 @@ class core
             $includes[] = "/$extension/$data[view].$extension";
             $includes[] = "/$extension/$data[view]/$data[page].$extension";
         }
-
-        $init_assets = $array[$extension]['init'] ?? [];
-        if (count($init_assets))
-            foreach ($init_assets as $init)
-                $includes[] = $init;
 
         $includes = array_unique($includes);
         if ($return) return $includes;
@@ -164,9 +171,20 @@ class core
             empty($this->data['page'])
         ) $this->NOT_FOUND('page/view not found');
     }
+    private function getHeaderCookie($lookFor)
+    {
+        $cookies = explode('; ', $this->getHeader('COOKIE'));
+        foreach ($cookies as $cookie) {
+            $try = explode('=', $cookie);
+            if ($try[0] == $lookFor) return $try[1];
+        }
+        return null;
+    }
     private function isRequest()
     {
-        return ($this->session == CSRF &&
+        return (
+            // $this->session == CSRF &&
+            $this->session != null &&
             strpos($this->getHeader('ACCEPT'), 'application/json') !== false
         );
     }
@@ -180,10 +198,10 @@ class core
         HTTPStatus(404);
         if (strpos($this->getHeader('ACCEPT'), 'application/json') !== false) {
             header('Content-Type: application/json');
-            $output = PRODUCTION ? 'Request is not valid!' : 'Request is not valid => ' . $content;
+            $output = getCons('PRODUCTION') ? 'Request is not valid!' : 'Request is not valid => ' . $content;
             // die(json_encode(['message' => CSRF.' '.$this->getHeader('INDICUM'). ':Request is not valid => ' . $content, 'error' => false]));
         } else
-            $output = PRODUCTION ? 'Page not found!' : 'Page not found! => ' . $content;
+            $output = getCons('PRODUCTION') ? 'Page not found!' : 'Page not found! => ' . $content;
 
         echo $output;
         exit;
@@ -194,30 +212,52 @@ class core
         $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
         try {
             $mail->isSMTP();
-            $mail->Host   = EMAIL_HOST;
+            $mail->Host   = getCons('EMAIL_HOST');
             $mail->SMTPAuth   = true;
-            $mail->Username   = EMAIL_USER;
-            $mail->Password   = EMAIL_PASS;
+            $mail->Username   = getCons('EMAIL_USER');
+            $mail->Password   = getCons('EMAIL_PASS');
             $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port   = 587;
-            $mail->setFrom(EMAIL_USER, EMAIL_NAME);
-            $mail->addReplyTo(EMAIL_USER, EMAIL_NAME);
+            $mail->setFrom(getCons('EMAIL_USER'), getCons('EMAIL_NAME'));
+            $mail->addReplyTo(getCons('EMAIL_USER'), getCons('EMAIL_NAME'));
             $mail->addAddress($recipient);
             $mail->isHTML(false);
             $mail->Subject = $subject;
             $mail->Body = $message;
             $mail->AltBody = \Soundasleep\Html2Text::convert($mail->Body, ['ignore_errors' => true]);
-            $mail->addCustomHeader('List-Unsubscribe', '<' . SITE_SUPPORT . '>, <https://' . SITE_DOMAIN . '/?unsubscribe=' . $recipient . '>');
-            $mail->XMailer = SITE_NAME;
+            $mail->addCustomHeader('List-Unsubscribe', '<' . getCons('SITE_SUPPORT') . '>, <https://' . getCons('SITE_DOMAIN') . '/?unsubscribe=' . $recipient . '>');
+            $mail->XMailer = getCons('SITE_NAME');
             return $mail->send();
         } catch (\Exception $e) {
             return "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
         }
     }
+    private function static_files($ext){
+        $STATIC_FILES = [
+            'js'    => 'application/javascript',
+            'pdf'   => 'application/pdf',
+            'json'  => 'application/json',
+            'zip'   => 'application/zip',
+            'ttf'   => 'application/octet-stream',
+            'woff'  => 'application/font-woff',
+            'css'   => 'text/css',
+            'scss'   => 'text/css',
+            'xml'   => 'text/xml',
+            'txt'   => 'text/plain',
+            'ico'   => 'image/x-icon',
+            'png'   => 'image/png',
+            'jpeg'  => 'image/jpeg',
+            'jpg'   => 'image/jpeg',
+            'gif'   => 'image/gif',
+            'svg'   => 'image/svg+xml',
+            // eot, woff2, mp4
+        ];
+        return array_key_exists($ext, $STATIC_FILES) ? $STATIC_FILES[$ext] : false;
+    }
     private function statics($static, $extension)
     {
         $directory = SERVER . '/public';
-        header('Content-Type: ' . STATIC_FILES[$extension]);
+        header('Content-Type: ' . $this->static_files($extension));
         $static = str_replace(['//', '../'], '/', $static);
         if (str_ends_with($static, '.manifest.js') || str_ends_with($static, '.manifest.css')) {
             $manifest = str_replace(['.manifest.js', '.manifest.css'], '', $static);
@@ -236,12 +276,13 @@ class core
 
             $uglify = new \NodejsPhpFallback\Uglify(
                 $manifest_files
+                // array_reverse($manifest_files)
             );
             exit($uglify);
         }
         $file = $directory . '/' . $static;
         if (file_exists($file)) {
-            if (!in_array($extension, MINIMIZE_FILES)) exit(file_get_contents($file));
+            if (!in_array($extension, ['css', 'js'])) exit(file_get_contents($file));
 
             $uglify = new \NodejsPhpFallback\Uglify([
                 $file
