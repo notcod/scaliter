@@ -9,8 +9,7 @@
     "license": "MIT",
     "autoload": {
         "files": [
-            "src/functions.php",
-            "src/config.php"
+            "src/functions.php"
         ],
         "psr-4": {
             "scaliter\\": "src/"
